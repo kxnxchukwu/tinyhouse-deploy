@@ -31,6 +31,7 @@ const parseAddress = (addressComponents) => {
 };
 exports.Google = {
     authUrl: auth.generateAuthUrl({
+        // eslint-disable-next-line @typescript-eslint/camelcase
         access_type: "online",
         scope: [
             "https://www.googleapis.com/auth/userinfo.email",
@@ -49,7 +50,7 @@ exports.Google = {
     geocode: (address) => __awaiter(this, void 0, void 0, function* () {
         const res = yield maps.geocode({ address }).asPromise();
         if (res.status < 200 || res.status > 299) {
-            throw new Error("Failed to Geocode Address");
+            throw new Error("failed to geocode address");
         }
         return parseAddress(res.json.results[0].address_components);
     })

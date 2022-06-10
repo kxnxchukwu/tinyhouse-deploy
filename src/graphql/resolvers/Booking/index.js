@@ -8,8 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const utils_1 = require("../../../lib/utils");
 const mongodb_1 = require("mongodb");
+const api_1 = require("../../../lib/api");
+const utils_1 = require("../../../lib/utils");
 const resolveBookingsIndex = (bookingsIndex, checkInDate, checkOutDate) => {
     let dateCursor = new Date(checkInDate);
     let checkOut = new Date(checkOutDate);
@@ -28,7 +29,7 @@ const resolveBookingsIndex = (bookingsIndex, checkInDate, checkOutDate) => {
             newBookingsIndex[y][m][d] = true;
         }
         else {
-            throw new Error("Selected dates cannnot overlap dates that have already been booked!");
+            throw new Error("selected dates can't overlap dates that have already been booked");
         }
         dateCursor = new Date(dateCursor.getTime() + 86400000);
     }
@@ -41,30 +42,32 @@ exports.bookingResolvers = {
                 const { id, source, checkIn, checkOut } = input;
                 let viewer = yield utils_1.authorize(db, req);
                 if (!viewer) {
-                    throw new Error("Viewer cannot be found.");
+                    throw new Error("viewer cannot be found");
                 }
                 const listing = yield db.listings.findOne({
                     _id: new mongodb_1.ObjectId(id)
                 });
                 if (!listing) {
-                    throw new Error("Listing cannot be found.");
+                    throw new Error("listing can't be found");
                 }
                 if (listing.host === viewer._id) {
-                    throw new Error("Viewer cannot book own listing.");
+                    throw new Error("viewer can't book own listing");
                 }
                 const checkInDate = new Date(checkIn);
                 const checkOutDate = new Date(checkOut);
                 if (checkOutDate < checkInDate) {
-                    throw new Error("Check Out Date cannot be before Check In Date.");
+                    throw new Error("check out date can't be before check in date");
                 }
                 const bookingsIndex = resolveBookingsIndex(listing.bookingsIndex, checkIn, checkOut);
-                const totalPrice = listing.price * ((checkOutDate.getTime() - checkInDate.getTime()) / 86400000 + 1);
+                const totalPrice = listing.price *
+                    ((checkOutDate.getTime() - checkInDate.getTime()) / 86400000 + 1);
                 const host = yield db.users.findOne({
                     _id: listing.host
                 });
                 if (!host || !host.walletId) {
-                    throw new Error("The Host either could not be found or is not connected with Stripe.");
+                    throw new Error("the host either can't be found or is not connected with Stripe");
                 }
+                yield api_1.Stripe.charge(totalPrice, source, host.walletId);
                 const insertRes = yield db.bookings.insertOne({
                     _id: new mongodb_1.ObjectId(),
                     listing: listing._id,
@@ -92,7 +95,7 @@ exports.bookingResolvers = {
                 return insertedBooking;
             }
             catch (error) {
-                throw new Error(`Failed to create a booking: ${JSON.stringify(error)}`);
+                throw new Error(`Failed to create a booking: ${error}`);
             }
         })
     },
