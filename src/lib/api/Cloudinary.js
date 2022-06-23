@@ -14,14 +14,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const cloudinary_1 = __importDefault(require("cloudinary"));
 exports.Cloudinary = {
     upload: (image) => __awaiter(this, void 0, void 0, function* () {
-        /* eslint-disable @typescript-eslint/camelcase */
         const res = yield cloudinary_1.default.v2.uploader.upload(image, {
             api_key: process.env.CLOUDINARY_KEY,
             api_secret: process.env.CLOUDINARY_SECRET,
             cloud_name: process.env.CLOUDINARY_NAME,
-            folder: "TH_Assets/"
+            folder: "Tinyhouse/"
         });
         return res.secure_url;
-        /* eslint-enable @typescript-eslint/camelcase */
     })
 };

@@ -11,7 +11,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongodb_1 = require("mongodb");
 const url = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_USER_PASSWORD}@${process.env.DB_CLUSTER}.mongodb.net`;
 exports.connectDatabase = () => __awaiter(this, void 0, void 0, function* () {
-    const client = yield mongodb_1.MongoClient.connect(url, { useNewUrlParser: true });
+    const client = yield mongodb_1.MongoClient.connect(url, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    });
     const db = client.db("main");
     return {
         bookings: db.collection("bookings"),

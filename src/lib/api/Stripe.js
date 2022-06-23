@@ -12,30 +12,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const stripe_1 = __importDefault(require("stripe"));
-const client = new stripe_1.default(`${process.env.S_SECRET_KEY}`);
+const client = new stripe_1.default(`${process.env.S_SECRET_KEY}`, {
+    apiVersion: '2020-08-27',
+});
 exports.Stripe = {
     connect: (code) => __awaiter(this, void 0, void 0, function* () {
         const response = yield client.oauth.token({
-            /* eslint-disable @typescript-eslint/camelcase */
             grant_type: "authorization_code",
             code
-            /* eslint-enable @typescript-eslint/camelcase */
         });
         return response;
     }),
     charge: (amount, source, stripeAccount) => __awaiter(this, void 0, void 0, function* () {
-        /* eslint-disable @typescript-eslint/camelcase */
         const res = yield client.charges.create({
             amount,
-            currency: "usd",
+            currency: "eur",
             source,
-            application_fee_amount: Math.round(amount * 0.05)
+            application_fee_amount: Math.round(amount * 0.10)
         }, {
             stripe_account: stripeAccount
         });
-        /* eslint-enable @typescript-eslint/camelcase */
         if (res.status !== "succeeded") {
-            throw new Error("failed to create charge with Stripe");
+            throw new Error("Failed to create charge with Stripe.");
         }
     })
 };

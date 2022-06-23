@@ -9,22 +9,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongodb_1 = require("mongodb");
-const api_1 = require("../../../lib/api");
 const types_1 = require("../../../lib/types");
 const utils_1 = require("../../../lib/utils");
+const api_1 = require("../../../lib/api");
 const types_2 = require("./types");
 const verifyHostListingInput = ({ title, description, type, price }) => {
     if (title.length > 100) {
-        throw new Error("listing title must be under 100 characters");
+        throw new Error("Listing Title must be under 100 characters.");
     }
     if (description.length > 5000) {
-        throw new Error("listing description must be under 5000 characters");
+        throw new Error("Listing Description must be under 5000 characters.");
     }
     if (type !== types_1.ListingType.Apartment && type !== types_1.ListingType.House) {
-        throw new Error("listing type must be either an apartment or house");
+        throw new Error("Listing Type must be either an Apartment or House.");
     }
     if (price < 0) {
-        throw new Error("price must be greater than 0");
+        throw new Error("Price must be greater than 0");
     }
 };
 exports.listingResolvers = {
@@ -63,7 +63,7 @@ exports.listingResolvers = {
                         query.country = country;
                     }
                     else {
-                        throw new Error("no country found");
+                        throw new Error("No Country Found");
                     }
                     const cityText = city ? `${city}, ` : "";
                     const adminText = admin ? `${admin}, ` : "";
@@ -83,7 +83,7 @@ exports.listingResolvers = {
                 return data;
             }
             catch (error) {
-                throw new Error(`Failed to query listings: ${error}`);
+                throw new Error(`Failed to query listings: ${JSON.stringify(error)}`);
             }
         })
     },
@@ -92,11 +92,11 @@ exports.listingResolvers = {
             verifyHostListingInput(input);
             let viewer = yield utils_1.authorize(db, req);
             if (!viewer) {
-                throw new Error("viewer cannot be found");
+                throw new Error("Viewer cannot be found");
             }
             const { country, admin, city } = yield api_1.Google.geocode(input.address);
             if (!country || !admin || !city) {
-                throw new Error("invalid address input");
+                throw new Error("Invalid Address Input");
             }
             const imageUrl = yield api_1.Cloudinary.upload(input.image);
             const insertResult = yield db.listings.insertOne(Object.assign({ _id: new mongodb_1.ObjectId() }, input, { image: imageUrl, bookings: [], bookingsIndex: {}, country,
